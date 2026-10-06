@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "colson-big-13.vercel.app" }],
+      "destination": "/colson-big-13_index.html"
+    }
+  ]
+}

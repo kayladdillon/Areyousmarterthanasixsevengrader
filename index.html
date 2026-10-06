@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Are You Smarter Than a 6/7 Grader? — Colson's Birthday Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;600;700;800&family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#041E42; --bg2:#06264f; --card:#0a2a5c; --card2:#144080;
+    --gold:#FFB020; --silver:#b0b7bc; --royal:#5d8fdc; --steel:#869397;
+    --green:#4ade80; --red:#f87171; --text:#f4f6ff; --dim:#93a5c2; --deep:#020f22;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:'Barlow Condensed',system-ui,sans-serif; min-height:100vh;
+    background-image:radial-gradient(circle at 15% 10%, rgba(93,143,220,.12) 0, transparent 40%),
+                     radial-gradient(circle at 85% 80%, rgba(255,176,32,.06) 0, transparent 45%);}
+  .display{font-family:'Archivo Black',sans-serif; letter-spacing:.02em; text-transform:uppercase;}
+
+  header{position:sticky; top:0; z-index:50; background:rgba(2,15,34,.95); backdrop-filter:blur(6px);
+    border-bottom:2px solid var(--card2); padding:10px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  header h1{font-family:'Archivo Black',sans-serif; font-size:clamp(1rem,3vw,1.5rem); letter-spacing:.03em; line-height:1; text-transform:uppercase;}
+  header h1 .six7{color:var(--gold);}
+  .scorebox{margin-left:auto; display:flex; align-items:center; gap:8px;}
+  .scorebox .lbl{font-size:.7rem; text-transform:uppercase; letter-spacing:.14em; color:var(--dim); font-weight:700;}
+  .scorebox .val{font-family:'Chakra Petch',monospace; font-size:1.7rem; color:var(--gold); min-width:64px; text-align:center;
+    background:var(--deep); border:2px solid var(--card2); border-radius:10px; padding:2px 12px; line-height:1.2;
+    text-shadow:0 0 12px rgba(255,176,32,.6);}
+  .scadj{background:var(--card); border:1px solid var(--card2); color:#fff; border-radius:8px; width:32px; height:32px;
+    font-weight:800; font-size:1rem; cursor:pointer;}
+  .scadj:hover{background:var(--card2);}
+  .cashout{background:var(--gold); color:#241a00; border:none; border-radius:10px; font-family:'Barlow Condensed'; font-weight:800;
+    padding:9px 16px; font-size:.85rem; cursor:pointer; text-transform:uppercase; letter-spacing:.1em;}
+  .cashout:hover{filter:brightness(1.08);}
+  .xiiibadge{font-family:'Chakra Petch',monospace; font-size:.8rem; color:var(--gold); border:1px solid rgba(255,176,32,.5);
+    border-radius:8px; padding:6px 10px; font-weight:700;}
+  .hostbtn{background:none; border:1px solid var(--card2); color:var(--steel); border-radius:8px; padding:6px 11px; cursor:pointer; font-size:.85rem;}
+  .hostbtn:hover{color:#fff;}
+
+  main{max-width:1100px; margin:0 auto; padding:26px 18px 80px;}
+
+  /* HOME */
+  .hero{text-align:center; margin-bottom:28px;}
+  .hero .kicker{color:var(--silver); text-transform:uppercase; letter-spacing:.28em; font-size:.75rem; font-weight:700;}
+  .hero h2{font-family:'Archivo Black',sans-serif; font-size:clamp(2.2rem,6.5vw,4.2rem); line-height:1.02; margin:10px 0 4px; text-transform:uppercase;}
+  .hero h2 em{font-style:normal; color:var(--gold);}
+  .hero p{color:var(--dim); max-width:640px; margin:10px auto 0; font-size:1.05rem; font-weight:500;}
+  .catgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;}
+  .catcard{background:linear-gradient(160deg,var(--card),var(--bg2)); border:2px solid transparent; border-radius:14px; padding:20px 20px 16px;
+    cursor:pointer; transition:transform .12s, border-color .12s; position:relative; overflow:hidden; text-align:left; color:var(--text); width:100%;}
+  .catcard:hover{transform:translateY(-3px);}
+  .catcard .num{font-family:'Archivo Black',sans-serif; font-size:2.8rem; opacity:.14; position:absolute; right:14px; top:6px;}
+  .catcard h3{font-family:'Archivo Black',sans-serif; font-size:1.35rem; letter-spacing:.03em; margin-bottom:4px; text-transform:uppercase;}
+  .catcard .tag{font-size:.9rem; color:var(--dim); margin-bottom:12px; min-height:2.4em; font-weight:500;}
+  .catcard .meta{display:flex; justify-content:space-between; font-size:.78rem; color:var(--dim); font-weight:700; letter-spacing:.06em;}
+  .catcard .prog{color:var(--gold);}
+  .catcard.done{opacity:.55;}
+  .catcard.done h3::after{content:' ✓'; color:var(--green);}
+  .catcard.locked{opacity:.4; cursor:not-allowed;}
+  .catcard.locked:hover{transform:none;}
+  .catcard.finalcat{border-color:rgba(255,176,32,.55) !important;}
+  .catcard.finalcat h3{color:var(--gold);}
+
+  /* CATEGORY VIEW */
+  .backbtn{background:none; border:2px solid var(--card2); color:var(--dim); border-radius:10px; padding:7px 14px;
+    cursor:pointer; font-family:'Barlow Condensed'; font-weight:700; font-size:.85rem; margin-bottom:18px; letter-spacing:.06em; text-transform:uppercase;}
+  .backbtn:hover{color:var(--text); border-color:var(--dim);}
+  .cathead h2{font-family:'Archivo Black',sans-serif; font-size:clamp(1.8rem,4.6vw,2.8rem); letter-spacing:.02em; text-transform:uppercase;}
+  .cathead p{color:var(--dim); margin:4px 0 22px; font-weight:500;}
+  .roundlbl{font-size:.78rem; text-transform:uppercase; letter-spacing:.24em; font-weight:800; margin:26px 0 10px;}
+  .tilegrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px;}
+  .tile{background:var(--card); border:2px solid var(--card2); border-radius:12px; padding:14px 10px; cursor:pointer;
+    text-align:center; transition:transform .1s, border-color .1s; color:var(--text); position:relative;}
+  .tile:hover{transform:translateY(-2px); border-color:var(--royal);}
+  .tile .tnum{font-family:'Archivo Black',sans-serif; font-size:1.5rem; line-height:1;}
+  .tile .ttype{font-size:.68rem; text-transform:uppercase; letter-spacing:.12em; color:var(--dim); margin-top:5px; font-weight:700;}
+  .tile .tpts{font-family:'Chakra Petch',monospace; font-size:.75rem; color:var(--gold); font-weight:700; margin-top:3px;}
+  .tile.done-correct{border-color:var(--green); opacity:.5;}
+  .tile.done-correct::after{content:'✓'; position:absolute; top:6px; right:9px; color:var(--green); font-weight:700;}
+  .tile.done-missed{border-color:var(--red); opacity:.5;}
+  .tile.done-missed::after{content:'✗'; position:absolute; top:6px; right:9px; color:var(--red); font-weight:700;}
+  .tile.bonus{border-color:var(--gold);}
+  .tile.bonus .tnum{color:var(--gold);}
+
+  /* MODAL */
+  .overlay{position:fixed; inset:0; background:rgba(2,8,20,.9); display:none; align-items:center; justify-content:center;
+    z-index:100; padding:16px;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--bg2); border:2px solid var(--card2); border-radius:18px; max-width:720px; width:100%;
+    max-height:92vh; overflow-y:auto; padding:28px 26px 22px; position:relative;}
+  .modal .mtag{font-size:.72rem; text-transform:uppercase; letter-spacing:.22em; font-weight:800; margin-bottom:10px;}
+  .modal .mq{font-size:1.3rem; font-weight:600; line-height:1.45; margin-bottom:6px; white-space:pre-line;}
+  .modal .mnote{background:rgba(255,176,32,.07); border-left:3px solid var(--gold); padding:9px 12px; border-radius:0 10px 10px 0;
+    font-size:.88rem; color:var(--dim); margin:14px 0 4px; white-space:pre-line; font-weight:500;}
+  .modal .mnote b{color:var(--gold);}
+  .answer{display:none; background:var(--card); border:2px solid var(--royal); border-radius:12px; padding:16px;
+    margin-top:16px; font-size:1.1rem; line-height:1.5; white-space:pre-line; font-weight:600;}
+  .answer.shown{display:block;}
+  .answer .albl{font-size:.7rem; text-transform:uppercase; letter-spacing:.22em; color:var(--royal); font-weight:800; display:block; margin-bottom:6px;}
+  .btnrow{display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;}
+  .btn{border:none; border-radius:10px; padding:12px 20px; font-family:'Barlow Condensed'; font-weight:800; font-size:.98rem;
+    cursor:pointer; letter-spacing:.05em; text-transform:uppercase;}
+  .btn.reveal{background:var(--royal); color:#071429;}
+  .btn.good{background:var(--green); color:#06280f;}
+  .btn.bad{background:var(--red); color:#330a0a;}
+  .btn.neutral{background:var(--card2); color:var(--text);}
+  .btn.goldb{background:var(--gold); color:#241a00;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.linka{text-decoration:none; display:inline-block;}
+  .closex{position:absolute; top:12px; right:16px; background:none; border:none; color:var(--dim); font-size:1.5rem; cursor:pointer;}
+  .ptschip{position:absolute; top:16px; right:52px; background:var(--gold); color:#241a00; font-weight:800;
+    border-radius:999px; padding:3px 12px; font-size:.8rem; font-family:'Chakra Petch',monospace;}
+
+  /* over/under */
+  .oubtns{display:flex; gap:12px; margin-top:18px;}
+  .oubtn{flex:1; font-family:'Archivo Black',sans-serif; font-size:1.3rem; letter-spacing:.04em; padding:16px; border-radius:12px;
+    border:2px solid var(--card2); background:var(--card); color:var(--text); cursor:pointer; text-transform:uppercase;}
+  .oubtn:hover{border-color:var(--royal);}
+  .oubtn.picked-right{border-color:var(--green); background:rgba(74,222,128,.15);}
+  .oubtn.picked-wrong{border-color:var(--red); background:rgba(248,113,113,.15);}
+
+  /* timer */
+  .timerbox{margin-top:18px; background:var(--deep); border:1px solid var(--card2); border-radius:14px; padding:16px; text-align:center;}
+  .timerbox .tdisp{font-family:'Chakra Petch',monospace; font-size:3.2rem; color:var(--gold); line-height:1; text-shadow:0 0 14px rgba(255,176,32,.55);}
+  .timerbox .tdisp.hidden-mode{filter:blur(14px);}
+  .timerbox .trow{display:flex; gap:8px; justify-content:center; margin-top:12px; flex-wrap:wrap;}
+  .timerbox .tbtn{background:var(--card2); border:none; color:var(--text); border-radius:9px; padding:8px 14px;
+    font-family:'Barlow Condensed'; font-weight:700; cursor:pointer; font-size:.83rem; letter-spacing:.05em; text-transform:uppercase;}
+  .timerbox .tbtn.go{background:var(--green); color:#06280f;}
+  .timerbox .tbtn.stop{background:var(--red); color:#330a0a;}
+  .timerbox.flash .tdisp{animation:flash .5s steps(2) 6;}
+  @keyframes flash{50%{color:var(--red);}}
+
+  /* chain */
+  .chainwrap{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; align-items:center;}
+  .chainword{font-family:'Archivo Black',sans-serif; font-size:1.05rem; letter-spacing:.04em; background:var(--card);
+    border:2px solid var(--card2); border-radius:8px; padding:6px 14px;}
+  .chainword.hidden-w{color:transparent; background:var(--card2); min-width:70px; text-align:center;}
+  .chainword.hidden-w::before{content:'?'; color:var(--dim); font-family:'Barlow Condensed';}
+  .chainarrow{color:var(--dim);}
+
+  /* list reveal */
+  .listwrap{margin-top:14px;}
+  .listitem{background:var(--card); border-radius:9px; padding:9px 14px; margin-top:7px; font-size:1rem; font-weight:600;}
+
+  /* QR */
+  .qrwrap{text-align:center; margin-top:16px;}
+  .qrwrap img{width:min(60vw,280px); background:#fff; padding:10px; border-radius:10px;}
+
+  /* final screen */
+  .finalwrap{text-align:center; padding:30px 10px;}
+  .finalwrap .fk{color:var(--silver); text-transform:uppercase; letter-spacing:.26em; font-size:.8rem; font-weight:800;}
+  .finalwrap h2{font-family:'Archivo Black',sans-serif; font-size:clamp(2.4rem,7vw,4.4rem); margin:10px 0; text-transform:uppercase;}
+  .finalscore{font-family:'Chakra Petch',monospace; font-size:5.6rem; color:var(--gold); line-height:1; text-shadow:0 0 24px rgba(255,176,32,.6);}
+  .finalmax{color:var(--dim); font-size:1rem; margin-top:4px; font-weight:600;}
+  .verdict{font-size:1.3rem; font-weight:600; max-width:560px; margin:22px auto 0; line-height:1.5;}
+  .confetti{position:fixed; top:-40px; font-size:1.5rem; z-index:200; animation:fall linear forwards; pointer-events:none;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);}}
+
+  /* hidden XIII */
+  .xiii{position:fixed; font-family:'Archivo Black',sans-serif; color:rgba(255,255,255,.05); font-size:.9rem; cursor:pointer;
+    user-select:none; padding:6px; z-index:45; transition:color .3s, text-shadow .3s;}
+  .xiii.found{color:var(--gold); text-shadow:0 0 16px rgba(255,176,32,.8); cursor:default;}
+
+  /* host modal */
+  #hostmodal{position:fixed; inset:0; background:rgba(2,8,20,.97); z-index:210; overflow-y:auto; padding:60px 20px; display:none;}
+  #hostmodal.open{display:block;}
+  #hostmodal .inner{max-width:760px; margin:0 auto;}
+  #hostmodal h2{font-family:'Archivo Black',sans-serif; text-transform:uppercase; font-size:1.5rem; margin-bottom:6px;}
+  #hostmodal h3{font-weight:800; text-transform:uppercase; font-size:.9rem; letter-spacing:.14em; color:var(--royal); margin:24px 0 8px;}
+  #hostmodal p,#hostmodal li{color:#cfd9ec; font-size:.95rem; line-height:1.7; font-weight:500;}
+  #hostmodal ul{padding-left:20px;}
+  #hostmodal .close{position:fixed; top:16px; right:20px; font-weight:800; letter-spacing:.2em; color:var(--silver); cursor:pointer;
+    border:1px solid var(--card2); padding:8px 14px; border-radius:8px; background:var(--deep); text-transform:uppercase; font-size:.8rem;}
+  .pin-row{display:flex; gap:10px; align-items:center; margin:14px 0;}
+  .pin-row input{background:var(--deep); border:1px solid var(--card2); color:#fff; padding:10px 14px; border-radius:8px;
+    font-size:1.1rem; width:130px; letter-spacing:.3em; font-weight:800; text-align:center; font-family:'Chakra Petch',monospace;}
+
+  /* bonus envelope */
+  #bonuslay{position:fixed; inset:0; background:rgba(2,8,20,.96); z-index:220; display:none; align-items:center; justify-content:center; padding:20px;}
+  #bonuslay.open{display:flex;}
+  .bonuscard{background:linear-gradient(180deg,var(--bg2),var(--bg)); border:2px solid var(--gold); border-radius:14px;
+    padding:36px 30px; text-align:center; max-width:460px; box-shadow:0 0 60px rgba(255,176,32,.25);}
+  .bonuscard h2{font-family:'Archivo Black',sans-serif; color:var(--gold); text-transform:uppercase; font-size:1.7rem; line-height:1.15;}
+  .bonuscard p{color:var(--dim); margin:14px 0 20px; line-height:1.7; font-weight:500;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ARE YOU SMARTER THAN A <span class="six7">6&thinsp;/&thinsp;7</span> GRADER?</h1>
+  <div class="scorebox">
+    <span class="xiiibadge" id="xiiibadge">XIII 0/7</span>
+    <button class="scadj" onclick="adj(-1)">&minus;</button>
+    <span class="val" id="score">0</span>
+    <button class="scadj" onclick="adj(1)">+</button>
+    <button class="cashout" onclick="showFinal()">Final Score</button>
+    <button class="hostbtn" onclick="openHost()">&#9733;</button>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section id="home">
+    <div class="hero">
+      <div class="kicker">A Very Official Birthday Examination · 13 Years in the Making</div>
+      <h2>COLSON <em>vs.</em> THE BOARD</h2>
+      <p>Six missions plus a final. Every answer suspiciously involves the number <b>13</b>, the date <b>July 11</b>, or the year <b>2013</b>. Coincidence? Absolutely not. Somewhere, seven gold XIIIs are hiding. Pick a mission to begin.</p>
+    </div>
+    <div class="catgrid" id="catgrid"></div>
+  </section>
+
+  <!-- CATEGORY -->
+  <section id="catview" class="hidden">
+    <button class="backbtn" onclick="goHome()">&larr; Back to the Board</button>
+    <div class="cathead" id="cathead"></div>
+    <div id="rounds"></div>
+  </section>
+
+  <!-- FINAL -->
+  <section id="finalview" class="hidden">
+    <div class="finalwrap">
+      <div class="fk">The Results Are In</div>
+      <h2>FINAL SCORE</h2>
+      <div class="finalscore" id="finalscore">0</div>
+      <div class="finalmax" id="finalmax"></div>
+      <div class="verdict" id="verdict"></div>
+      <div class="btnrow" style="justify-content:center; margin-top:28px;">
+        <button class="btn neutral" onclick="backFromFinal()">Keep Playing</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- BONUS ENVELOPE -->
+<div id="bonuslay">
+  <div class="bonuscard">
+    <h2>Bonus Envelope Unlocked</h2>
+    <p>Seven gold XIIIs. Nothing tonight was an accident.<br>Tell the host: <b style="color:var(--gold)">&ldquo;Ho fatto tredici.&rdquo;</b></p>
+    <button class="btn goldb" onclick="document.getElementById('bonuslay').classList.remove('open')">Back to the Board</button>
+  </div>
+</div>
+
+<!-- HOST KEY -->
+<div id="hostmodal">
+  <div class="close" onclick="closeHost()">Close</div>
+  <div class="inner">
+    <h2>Host Key</h2>
+    <div id="hostlock">
+      <div class="pin-row">
+        <input id="pin" inputmode="numeric" maxlength="4" placeholder="PIN">
+        <button class="btn reveal" onclick="tryPin()">Unlock</button>
+      </div>
+      <p style="color:var(--steel); font-size:.85rem;">The birthday. Four digits.</p>
+    </div>
+    <div id="hostbody" class="hidden">
+      <h3>Reward Map — 13 gifts, 2 per mission (bonus + completion). Final unlocks #13.</h3>
+      <ul>
+        <li><b>13 Going on 30:</b> Money Tree (13 slots = $30) + fake credit card on the Price Is Right win. Hacky Sack (Maclin).</li>
+        <li><b>Prime Time:</b> Jersey (prime #5) + tape measure. Watch (Dad) + small clock. Football poster.</li>
+        <li><b>Stars and Stripes:</b> Star Wars poster + globe. Gold coin from Dad (Captain America + Buc-ee's).</li>
+        <li><b>Trick or Treat:</b> Candy basket + Sour Patch chapstick. Socks + McDonald's toy.</li>
+        <li><b>Luck of the Draw:</b> 13 lotto tickets (Wheel of Unfortunate). Green Lego car (Maclin). House &rarr; Beatles magazine.</li>
+        <li><b>Chapter 13:</b> Chain Link &rarr; Snake. Wordle/Scrabble &rarr; Harry Potter box &rarr; bracelet &ldquo;Always&rdquo; (Mom).</li>
+        <li><b>Final:</b> Luggage tag twins &rarr; Mickey backpack &rarr; QR &rarr; Gift #13: the D23 trip.</li>
+      </ul>
+      <h3>Gift-Match Grid (L&rarr;R, top&rarr;bottom)</h3>
+      <p>1 Tape measure &middot; 2 Beatles mag &middot; 3 Globe + star &middot; 4 Wheel of Unfortunate &middot; 5 HP box &middot; 6 Luggage tag (twin hides the last puzzle) &middot; 7 Green poop (decoy) &middot; 8 Sour Patch &middot; 9 Clock &middot; 10 Fake credit card &middot; 11 Captain America &middot; 12 McDonald's &middot; 13 Snake &middot; 14 Green car &middot; 15 Football</p>
+      <h3>Decor Trivia Key</h3>
+      <ul>
+        <li>Grandfather clock: &ldquo;13th stroke of a crazy clock&rdquo; &mdash; one false strike discredits the other 12. The clock's numbers sum to 13. Real exception: St. Mark's, Worsley.</li>
+        <li>Sharknado premiered July 11, 2013. Jeter returned July 11, 2013. Order of the Phoenix hit theaters July 11, 2007.</li>
+        <li>&ldquo;Fare tredici&rdquo; = the jackpot: 13 correct soccer picks. The bonus-envelope phrase.</li>
+        <li>2013: first all-unique-digit year since 1987; digits 0-1-2-3 last scrambled in 1432. Year of the Water Snake &mdash; and the Year of Luigi. Pantone: Emerald.</li>
+        <li>Grand Water Trine, July 2013: Jupiter (luck) + Saturn (structure) + Neptune (dreams).</li>
+        <li>Party game answer: 13 pounds. Baker's dozen: the 13th loaf beat the penalty.</li>
+      </ul>
+      <h3>Controls</h3>
+      <p>Tiles open modals; ✓/✗ settle each tile and track the score. +/&minus; in the header adjusts anything (use it to add Songlio points, 2 per correct song). The final mission unlocks when all six are fully played &mdash; or override below. Countdown QR lives in the Daily Double.</p>
+      <button class="btn goldb" onclick="unlockFinal()">Override: Unlock the Daily Double</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ GAME DATA ============ */
+const QR_SRC = "data:image/png;base64,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";
+
+const GAME = [
+{
+  name:"13 GOING ON 30", cls:"c0", accent:"#b0b7bc",
+  tag:"Prices, slang, and bangers. 6 + bonus, 7 + bonus, and a 16-point music finale. That's 30. Math.",
+  rounds:[
+  { label:"THE PRICE IS RIGHT — Over or Under $13?", items:[
+    {t:"ou", pts:1, q:"General Admission 2D Adult Movie Ticket", price:"$13.50", ans:"OVER"},
+    {t:"ou", pts:1, q:"Tide Liquid Laundry Detergent (80 Fluid Oz)", price:"$12.99", ans:"UNDER"},
+    {t:"ou", pts:1, q:"Cottonelle Ultra Comfort Toilet Paper (12 Mega Rolls)", price:"$14.50", ans:"OVER"},
+    {t:"ou", pts:1, q:"McDonald's Big Mac Meal", price:"$13.50", ans:"OVER"},
+    {t:"ou", pts:1, q:"Disney+ with Hulu Subscription (with Ads)", price:"$12.99", ans:"UNDER"},
+    {t:"ou", pts:1, q:"Dozen of Krispy Kreme Original Glazed Donuts", price:"$16.99", ans:"OVER"},
+    {t:"ch", pts:2, bonus:true, q:"LIFE SKILL BONUS: Calculate the sales tax.",
+      note:"Host: pick one of the items he just priced and have him calculate the sales tax on it. Adulthood is coming for him either way. (Big Mac meal at 8% = $14.58.)"},
+  ]},
+  { label:"TEEN TRANSLATIONS — Match the 1996 vs 2026 Slang", items:[
+    {t:"tr", pts:1, q:"1996: “All of that and a bag of chips”\nHighly impressive — the “total package.”\n\nWhat's the 2026 version?", a:"GOAT (accept: slayed)"},
+    {t:"tr", pts:1, q:"1996: “Buggin'”\nFreaking out, overreacting, acting crazy.\n\nWhat's the 2026 version?", a:"CRASHING OUT (accept: delulu)"},
+    {t:"tr", pts:1, q:"1996: “Balla”\nA wealthy person living a lavish, flashy, rags-to-riches lifestyle.\n\nWhat's the 2026 version?", a:"DRIP — immaculate, high-fashion style — or FLEXING — showing off your wealth or status. Essentially acting like a baller."},
+    {t:"tr", pts:1, q:"1996: “Da Bomb”\nExcellent. Amazing.\n\nWhat's the 2026 version?", a:"FIRE, SLAPS, or ATE"},
+    {t:"tr", pts:1, q:"1996: “Fly”\nStylish, attractive, cool.\n\nWhat's the 2026 version?", a:"AURA"},
+    {t:"tr", pts:1, q:"1996: “Phat”\n“Pretty hot and tempting” — exceptionally cool or fashionable.\n\nWhat's the 2026 version?", a:"BUSSIN or BASE"},
+    {t:"tr", pts:1, q:"1996: “Mackin'”\nIncredible charm — could talk to anyone.\n\nWhat's the 2026 version?", a:"RIZZ"},
+    {t:"tr", pts:2, bonus:true, q:"LIFE SKILL BONUS: In 2025, how many slang phrases, words, or meanings were added to the dictionary?", a:"6,212"},
+  ]},
+  { label:"TEEN BOP — Name That Tune (16 pts)", items:[
+    {t:"link", pts:16, q:"THE OFFICIAL MUSIC ROUND.\n\n8 songs. 2 points each. Runs on Songlio — host presses play, Colson names the tunes.",
+      url:"https://songl.io?quiz=Abacf", label:"▶ Play on Songlio",
+      note:"Score it with the +/− in the header: 2 points per correct song. Come back for the encore round when the music stops."},
+    {t:"tr", pts:1, q:"ENCORE: This founding father was shot in his famous duel on July 11.", a:"Alexander Hamilton — “Ten Duel Commandments.”"},
+    {t:"tr", pts:1, q:"ENCORE: Both left-handed Beatles. Name them.", a:"Paul McCartney and Ringo Starr — “I Want to Hold Your Hand.” (On Air – Live at the BBC Vol. 2 dropped in 2013.)"},
+    {t:"tr", pts:1, q:"ENCORE: “Cups,” “Let It Go,” AND the Year of Luigi all belong to this year.", a:"2013."},
+    {t:"tr", pts:1, q:"ENCORE: “Defying Gravity” is this track number on the original Wicked album.", a:"13."},
+    {t:"tr", pts:1, q:"ENCORE: She first took over the Sunday Night Football opener for the 2013 season.", a:"Carrie Underwood — “Waiting All Day for Sunday Night.”"},
+    {t:"tr", pts:1, bonus:true, q:"ENCORE BONUS: Pantone's 2013 Color of the Year — a lively, radiant, lush green symbolizing balance and harmony.", a:"Emerald. Keep an eye out for green tonight."},
+  ]},
+]},
+{
+  name:"PRIME TIME", cls:"c1", accent:"#5d8fdc",
+  tag:"Cowboys stats, physical challenges, and prime numbers. Not just Deion Sanders!",
+  rounds:[
+  { label:"STAR STATS — Dallas Cowboys Trivia", items:[
+    {t:"tr", pts:1, q:"THE 13-WIN CURSE: The Cowboys have won exactly 13 regular-season games four times (1992, 1994, 2007, 2016). In three of those four seasons, what shocking thing happened next?", a:"They were upset and eliminated in their very first playoff game."},
+    {t:"tr", pts:1, q:"THE EMMITT SMITH 13: Emmitt holds the NFL record for most consecutive 1,000-yard rushing seasons. How many straight years?", a:"Exactly 13 (1991–2003)."},
+    {t:"tr", pts:1, q:"THE 13-POINT COMEBACK: The largest fourth-quarter comeback in Cowboys playoff history is how many points?", a:"13 — Roger Staubach against the 49ers, 1972 divisional round."},
+    {t:"tr", pts:1, q:"THE 13-SECOND NIGHTMARE: 2021 playoffs, Dak's QB draw against the 49ers. How long did the final play take, snap to final whistle?", a:"Exactly 13 seconds."},
+    {t:"tr", pts:1, q:"SUPER BOWL 13: Cowboys vs. Steelers, 1979 — one of the greatest games ever played. What record did it set at the time?", a:"Most points scored in a Super Bowl (35–31)."},
+    {t:"tr", pts:1, q:"THE 13-POINT QUARTER: October 11, 1998 — two defensive touchdowns, one missed extra point. How many points did the Cowboys defense alone score that quarter?", a:"Exactly 13."},
+    {t:"tr", pts:1, q:"THE 13-CATCH CLUB: Only three Cowboys have ever caught exactly 13 passes in a single game. Name one.", a:"Jason Witten (twice), Michael Irvin, or Miles Austin."},
+  ]},
+  { label:"4TH & INCHES — Physical Challenges", items:[
+    {t:"ch", pts:2, q:"Find an item in the house that is exactly 13 inches long.", note:"Host: closest to 13 inches wins. Bring a ruler. No, a footlong sub is 12 — nice try."},
+    {t:"ch", pts:2, q:"Walk 13 feet — blindfolded.", note:"Host: mark the line first. Clear the coffee table. We want a birthday, not an ER visit."},
+    {t:"ch", pts:2, q:"ENDZONE DANCE: Dance, then stop when you think exactly 13 seconds have passed.", timer:20, hideTimer:true, note:"Host: start the timer (display is blurred so he can't peek). He dances, he stops, you check. Within 1 second of 13 = full points."},
+  ]},
+  { label:"PRIME TIME — Number Challenges", items:[
+    {t:"tr", pts:1, q:"Not just Deion Sanders! What is a prime number?", a:"A number that can only be divided by 1 and itself.\n\nBonus facts: every prime above 5 ends in 1, 3, 7, or 9 — and there are exactly 25 primes between 1 and 100."},
+    {t:"tr", pts:2, q:"PRIME PLACEMENT: Your birthday — 7/11/13 — is three consecutive primes. Name the missing primes between 1 and 100.", a:"2, 3, 5, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97.\n\n(Notice 67 made the list, 6/7 grader.)"},
+    {t:"tr", pts:2, q:"PRIME TIME CHALLENGE: On a 24-hour digital clock, a “Prime Time” is when both the hour AND the minute are prime — like 23:05. How many Prime Times per day?\n\n(Hint: 8 prime hours, 17 prime minutes.)", a:"8 × 17 = 136 Prime Times a day."},
+    {t:"tr", pts:2, q:"PRIME SCORE PROBLEM: Can a football team reach a final score of exactly 13 using ONLY prime-numbered scoring plays?", a:"Yes! Two field goals (3 + 3) and a touchdown with a missed extra point (7). Because 3 and 7 are both prime, 13 is a prime score built entirely from primes."},
+  ]},
+]},
+{
+  name:"STARS AND STRIPES", cls:"c2", accent:"#FFB020",
+  tag:"America, the flag, the dollar bill… and then straight into space.",
+  rounds:[
+  { label:"AMERICA SAYS", items:[
+    {t:"tr", pts:1, q:"Which of these are NOT one of the Thirteen Original Colonies?\n\nVirginia · Vermont · Georgia · Maine · Delaware", a:"Vermont and Maine.", note:"Host: read the five options out loud. Two are impostors."},
+    {t:"tr", pts:1, q:"The phrase “E Pluribus Unum” means “Out of many, one.” How many letters does it have?", a:"13."},
+    {t:"tr", pts:1, q:"The original United States flag had how many stars and how many stripes?", a:"13 stars and 13 stripes — the original 13 colonies."},
+    {t:"tr", pts:2, q:"THE DOLLAR BILL: The Great Seal is packed with 13-themed symbols. Name as many as you can.", a:"13 steps on the pyramid · 13 stars above the eagle · 13 stripes on the shield · 13 arrows in the left talon · 13 olive leaves with 13 berries in the right talon."},
+    {t:"tr", pts:1, q:"While 8 U.S. presidents have been left-handed, 3 of the 6 most recent are lefties. Name one.", a:"Obama, George H. W. Bush, or Clinton."},
+    {t:"tr", pts:1, q:"CAPTAIN AMERICA: On July 11, 2013, Entertainment Weekly announced this Marvel short film. (Hint: Agent 13…)", a:"Agent Carter."},
+  ]},
+  { label:"FREEDOM CHALLENGES", items:[
+    {t:"ch", pts:2, q:"FRISBEE FREEDOM TOSS: Land a frisbee 50 feet away.\n\n(50 states. 16.7 yards. Zero excuses.)", note:"Host: measure it out. 50 feet = 16.7 yards."},
+    {t:"ch", pts:3, q:"MASTER BUILDER: Build the American flag out of Legos in under 13 minutes.", timer:780, note:"Host: 13-minute countdown is loaded. Stars optional, effort mandatory."},
+  ]},
+  { label:"SPACE", items:[
+    {t:"tr", pts:1, q:"Space. Treasure. Adventure. This lucky actor — whose luck ran out in Episode VII — was born on July 13.", a:"Harrison Ford."},
+    {t:"ch", pts:2, q:"There are 12 zodiac signs. Name as many as you can in 13 seconds.", timer:13, note:"Answer key: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces."},
+    {t:"tr", pts:1, q:"STAR WARS — THE CLONE WARS: The poignant thirteenth and final episode of Season 6 — Yoda's journey to the Sith homeworld — is titled what?", a:"“Sacrifice.”"},
+    {t:"tr", pts:1, q:"STAR WARS: The most infamous, dangerous underworld level deep inside Coruscant?", a:"Level 1313."},
+    {t:"tr", pts:1, q:"“Houston, we have a problem.” Tom Hanks — the Toy Story and Forrest Gump guy — starred in this movie. Name it.", a:"Apollo 13. (The explosion hit at 13:13 mission time — look at that.)"},
+    {t:"list", pts:3, q:"MARVEL MARATHON: List the first 13 Marvel movies in release order. Host reveals one at a time — how far can he get?",
+      list:["Iron Man (2008)","The Incredible Hulk (2008)","Iron Man 2 (2010)","Thor (2011)","Captain America: The First Avenger (2011)","The Avengers (2012)","Iron Man 3 (2013)","Thor: The Dark World (2013)","Captain America: The Winter Soldier (2014)","Guardians of the Galaxy (2014)","Avengers: Age of Ultron (2015)","Ant-Man (2015)","Captain America: Civil War (2016)"]},
+    {t:"ch", pts:3, q:"SPACE BALLS: Glow-in-the-dark basketball. 13 balls total — sink at least 2 in a row.", note:"Host: lights off. That's the whole point."},
+  ]},
+]},
+{
+  name:"TRICK OR TREAT", cls:"c3", accent:"#869397",
+  tag:"Candy, cookies, and the Colson Bowl. 13 total. Obviously.",
+  rounds:[
+  { label:"CHALLENGES", items:[
+    {t:"tr", pts:2, q:"TRICK SHOT SETUP: Six cups, labeled 13 · 7 · 6 · 5 · 4 · 2. You bounce the ball, cups you sink add up — land EXACTLY on 13. Before you throw: how many winning combinations are there?", a:"FOUR:\n13 alone · 7+6 · 7+4+2 · 6+5+2.\n\nClose calls that bust or fall short: 7+5=12, 7+4=11, 6+4+2=12."},
+    {t:"ch", pts:3, q:"TRICK SHOT: Bounce the ball into the cups. Total exactly 13. Stop shooting whenever you want — go over and you bust.", note:"Host: it's mini Price Is Right. He decides when to stop. Sweating is part of the game."},
+    {t:"link", pts:3, q:"COLSON BOWL XIII — THE FOOD PYRAMID CHAMPIONSHIP.\n\nSort all 38 concessions into the pyramid. Refs' decisions are final.",
+      url:"colson-bowl-xiii.html", label:"🏈 Kickoff",
+      note:"Opens the stadium. Come back here when the trophy's been lifted."},
+    {t:"tr", pts:1, bonus:true, q:"PYRAMID BONUS: This is a staple in pantries and is the 13th element on the periodic table.", a:"Aluminum. (Foil — pantry staple, element 13.)"},
+    {t:"ch", pts:3, q:"TOWER OF TERROR: Stack 13 Oreos in a perfectly straight, free-standing vertical tower — fast.\n\nTHE RULES:\n• One hand only.\n• The tower must stand on its own for at least 5 seconds after the last cookie.", timer:60, note:"Host: timer is optional pressure. The 5-second stand is not."},
+  ]},
+  { label:"CANDY CRUSH", items:[
+    {t:"list", pts:3, q:"Rank the following candy by when they were first introduced (oldest first):\n\nTrolli · Sour Patch Kids · DumDums · Reese's Peanut Butter Eggs · Oreo Cookies · Swedish Fish · Skittles · Rolos · Hershey Kisses · Starburst · Twix · M&Ms · Haribo Gummy Bears",
+      list:["Hershey Kisses (1907)","Oreo Cookies (1912)","Haribo Gummy Bears (1922)","DumDums (1924)","Rolos (1937)","M&Ms (1941)","Swedish Fish (1950s)","Starburst (1960)","Reese's Peanut Butter Eggs (1967)","Twix (1967)","Skittles (1974)","Trolli (1975)","Sour Patch Kids (1985)"],
+      note:"Host answer key uses approximate first-introduction years. Reveal one at a time."},
+  ]},
+  { label:"TRIVIA", items:[
+    {t:"tr", pts:1, q:"This candy was introduced in 1896 and was the first wrapped candy in America.", a:"The Tootsie Roll."},
+    {t:"tr", pts:1, q:"SPICE SORT: Which of the following is NOT considered a spice?\n\nCinnamon · Pepper · Salt · Nutmeg", a:"Salt."},
+    {t:"tr", pts:1, q:"BAKER'S DOZEN: A standard dozen is 12, but a “baker's dozen” is 13. Why?", a:"Medieval England — bakers were heavily penalized for shorting bread weights, so they'd add an extra loaf to be safe."},
+    {t:"tr", pts:1, q:"This popular holiday candy was originally marketed as “Chicken Feed.”", a:"Candy Corn."},
+    {t:"tr", pts:1, q:"Which of these is NOT a July food holiday?\n\nNational Ice Cream Day · Caesar Salad Day · National Hot Dog Day · National Hamburger Day", a:"National Hamburger Day. (That one's in May.)"},
+    {t:"tr", pts:1, q:"Every major league sport has an official candy partner. Match them up: NBA, MLB, and Soccer.", a:"NBA = Sour Patch (and Snickers), MLB = Baby Ruth, Soccer = Trolli.", note:"Host: offer “bubblegum” as the tempting wrong answer for MLB."},
+  ]},
+]},
+{
+  name:"LUCK OF THE DRAW", cls:"c4", accent:"#1e5bc6",
+  tag:"Colors + luck. Cards, Uno, lefties, Zelda, and one suspicious physicist.",
+  rounds:[
+  { label:"DRAW!", items:[
+    {t:"ch", pts:3, q:"DECK OF CARDS: 52 cards. 130 seconds. How many 13s can you make?", timer:130, note:"Host: pairs/combos that sum to 13, or Kings (the 13th card) — your house rules. Count them up."},
+    {t:"tr", pts:1, q:"An Uno deck has 4 colors — 3 of them are prime colors. Name the 3.", a:"Yellow, Red, Blue."},
+    {t:"ch", pts:2, q:"Around 13 per cent of the world's people are left-handed. Using ONLY your left hand, draw an X.", note:"Host: legibility is judged. Harshly."},
+    {t:"tr", pts:2, q:"6 of these 7 famous people are left-handed. Who is the odd one out?\n\nLeonardo da Vinci · Hugh Jackman · Bill Gates · Neil Armstrong · Prince William · Babe Ruth · Albert Einstein",
+      a:"ALBERT EINSTEIN — the only non-lefty. (Also born in 1879, another all-unique-digit year like 2013.)\n\nThe lefties:\n• Leonardo da Vinci (Art) — The Last Supper has 13 figures\n• Hugh Jackman (Marvel) — July 2013: The Wolverine\n• Bill Gates (Technology) — Forbes' richest person for 13 consecutive years\n• Neil Armstrong (Space) — Apollo 11\n• Prince William (Stars & Stripes) — first son born July 2013\n• Babe Ruth (Sports) — MLB debut on July 11"},
+  ]},
+  { label:"COLOR + LUCK", items:[
+    {t:"tr", pts:1, q:"To draw the sword, you need 13 of THESE in this generational game.", a:"Hearts. In Zelda: Breath of the Wild and Tears of the Kingdom, Link needs exactly 13 permanent heart containers to pull the Master Sword and survive the health drain."},
+    {t:"ch", pts:3, q:"RAINBOW ROAD: Build the racetrack out of Magnatiles and race the Mario Hot Wheels cars.", note:"Host: rainbow order encouraged. Falling off the track is canon."},
+    {t:"ch", pts:2, q:"CAR RAINBOW: Name 13 car colors — in alphabetical order.", note:"Host: any 13 real colors, A to Z order. Example run: Black, Blue, Bronze, Brown, Gold, Gray, Green, Orange, Purple, Red, Silver, White, Yellow."},
+    {t:"ch", pts:3, q:"COLOR CODE: 13 balloons, each with a letter. Arrange them to spell the secret phrase.", note:"Host: the letters spell “FUN WITH FLAGS” — and should run red, white, and blue in order. Big Bang string theory approved."},
+    {t:"tr", pts:1, q:"GREEN: Green is the color of money and luck. In 2013, this green brother was so heavily promoted that 2013 was officially “The Year of ______.”", a:"Luigi — The Year of Luigi."},
+    {t:"tr", pts:1, q:"BLACK: Sirius Black's Gringotts vault number is 711. What ALSO happens on page 711 of the original UK edition of Order of the Phoenix?", a:"It's the exact page where Sirius falls through the veil in the Department of Mysteries."},
+    {t:"tr", pts:1, q:"RED: Taylor + Kelce. His jersey number. The game she first showed up to. Super Bowl 58 (5 + 8 = ?). What's the number?", a:"13. Number 13, 13th game, Super Bowl 58 (5+8=13). Taylor's lucky number — born on the 13th, turned 13 on Friday the 13th, first album went gold in 13 weeks."},
+  ]},
+]},
+{
+  name:"CHAPTER 13", cls:"c5", accent:"#e8ecf2",
+  tag:"The final chapter — where things stop being cute and start getting serious.",
+  rounds:[
+  { label:"THE OPENER", items:[
+    {t:"tr", pts:1, q:"In a lot of stories, this number sounds like the chapter where things stop being cute and start getting serious.", a:"Chapter 13."},
+  ]},
+  { label:"THE 13TH HOUR — On This Day, In That Year", items:[
+    {t:"tr", pts:1, q:"TRUE or FALSE: A church clock in England was built to strike 13 times — on purpose.", a:"TRUE. St. Mark's Church, Worsley. The Duke of Bridgewater rigged it to strike a loud, unmissable 13 at 1:00 PM after miners claimed they “didn't hear” the single lunch bell."},
+    {t:"tr", pts:1, q:"In Italy, “fare tredici” — to make 13 — means this.", a:"Hitting the jackpot. It comes from Totocalcio: predict 13 soccer results, shout “ho fatto tredici!”"},
+    {t:"tr", pts:1, q:"Premiered July 11, 2013: a freak hurricane hits Los Angeles and hurls THESE into the city.", a:"Sharks. Sharknado."},
+    {t:"tr", pts:1, q:"July 11, 2013 — this Yankees captain returned from a nine-month ankle injury for his season debut.", a:"Derek Jeter."},
+    {t:"tr", pts:1, q:"2013 was the first year with four all-different digits since this year.", a:"1987. (And 2013's digits — 0, 1, 2, 3 — were last scrambled like that in 1432, nearly 600 years earlier.)"},
+    {t:"tr", pts:1, q:"RIDDLE: “I swim in the water but I don't lay eggs like a fish. My mom carries me inside her body for exactly 13 weeks before I am born a champion swimmer. What am I?”", a:"A Water Snake — the official animal of 2013. In zodiac lore, Water Snakes are deep thinkers and natural mathematicians."},
+    {t:"tr", pts:1, q:"Released in U.S. theaters on July 11, 2007.", a:"Harry Potter and the Order of the Phoenix."},
+  ]},
+  { label:"CHAIN LINK", items:[
+    {t:"chain", pts:5, q:"Each word links to the next (money → ball = moneyball, ball → game = ballgame…). Guess the next link — host reveals one at a time. How far down the chain can he get?",
+      chain:["MONEY","BALL","GAME","TIME","LEFT","HAND","DRAW","STRING","CHEESE","CRACKER","JACK","POT","LUCK","POTION","MASTER","SWORD","FIGHT","SONG","PITCH","BLACK","BIRD","HOUSE","ELF"],
+      note:"Host: give hints freely. 23 words. Every link is a callback to tonight's game — that's not an accident."},
+  ]},
+  { label:"WORDLE", items:[
+    {t:"tr", pts:2, q:"FINAL QUESTION: This 6-letter word is worth exactly 13 points by placing one of its 1-point letters (A, L, or S) on a Double Letter Score.\n\nIt's also what this family is… no matter how old you get.", a:"ALWAYS.\n\n“After all this time?” — “Always.” Thirteen dined at Grimmauld Place; Sirius rose first. He broke out of Azkaban after 13 years — Vault 711 — out of loyalty and love. That's what the bracelet means."},
+  ]},
+]},
+{
+  name:"THE DAILY DOUBLE", cls:"c6", accent:"#FFB020", final:true,
+  tag:"Final unlock. Two tags. One twin. One door.",
+  rounds:[
+  { label:"THE FINAL MISSION", items:[
+    {t:"ch", pts:2, q:"FIND MY TWIN: Two identical luggage tags exist in this house. One is in the gift grid. Its twin is hiding. Bring both to the host.", note:"Host: the twin holds the last puzzle."},
+    {t:"tr", pts:2, q:"THE LAST PUZZLE: Inside the tag — one final puzzle. Say the answer out loud.", a:"The host decides if you've earned the door."},
+    {t:"qr", pts:0, q:"ONE CODE LEFT. SCAN IT.", note:"This is not a link. It's a boarding call."},
+  ]},
+]},
+];
+
+/* ============ STATE ============ */
+let score = 0, curCat = null, timerInt = null;
+let results = {}, found = {}, finalUnlocked = false;
+try{
+  const p = JSON.parse(localStorage.getItem('colson67game')||'{}');
+  if(typeof p.score==='number') score = p.score;
+  if(p.results) results = p.results;
+  if(p.found) found = p.found;
+  if(p.finalUnlocked) finalUnlocked = p.finalUnlocked;
+}catch(e){}
+function save(){ try{ localStorage.setItem('colson67game', JSON.stringify({score,results,found,finalUnlocked})); }catch(e){} }
+
+const $ = id => document.getElementById(id);
+
+/* ============ HOME ============ */
+function itemCount(cat){ return cat.rounds.reduce((s,r)=>s+r.items.length,0); }
+function doneCount(ci){ let n=0; GAME[ci].rounds.forEach((r,ri)=>r.items.forEach((_,ii)=>{ if(results[`${ci}-${ri}-${ii}`]) n++; })); return n; }
+function maxScore(){ let m=0; GAME.forEach(c=>c.rounds.forEach(r=>r.items.forEach(i=>m+=i.pts))); return m; }
+function mainsDone(){ return GAME.every((c,i)=> c.final || doneCount(i)===itemCount(c)); }
+
+function renderHome(){
+  const g = $('catgrid'); g.innerHTML='';
+  GAME.forEach((cat,ci)=>{
+    const total=itemCount(cat), done=doneCount(ci);
+    const locked = cat.final && !finalUnlocked && !mainsDone();
+    const b=document.createElement('button');
+    b.className='catcard'+(done===total?' done':'')+(cat.final?' finalcat':'')+(locked?' locked':'');
+    b.style.borderColor = locked ? 'transparent' : cat.accent;
+    b.innerHTML=`<div class="num">${cat.final?'★':ci+1}</div><h3 style="color:${cat.accent}">${cat.name}</h3>
+      <div class="tag">${locked?'Locked. Finish all six missions — or ask the host nicely.':cat.tag}</div>
+      <div class="meta"><span>${total} tiles</span><span class="prog">${done}/${total} played</span></div>`;
+    if(!locked) b.onclick=()=>openCat(ci);
+    g.appendChild(b);
+  });
+  updateXiii();
+  placeXiii('home');
+}
+
+function goHome(){ curCat=null; $('catview').classList.add('hidden'); $('finalview').classList.add('hidden'); $('home').classList.remove('hidden'); renderHome(); window.scrollTo(0,0); }
+
+/* ============ CATEGORY ============ */
+function openCat(ci){
+  curCat=ci;
+  const cat=GAME[ci];
+  $('home').classList.add('hidden'); $('finalview').classList.add('hidden');
+  const cv=$('catview'); cv.classList.remove('hidden');
+  $('cathead').innerHTML=`<h2 style="color:${cat.accent}">${cat.name}</h2><p>${cat.tag}</p>`;
+  const R=$('rounds'); R.innerHTML='';
+  cat.rounds.forEach((r,ri)=>{
+    const lbl=document.createElement('div'); lbl.className='roundlbl'; lbl.style.color=cat.accent; lbl.textContent=r.label; R.appendChild(lbl);
+    const grid=document.createElement('div'); grid.className='tilegrid';
+    r.items.forEach((it,ii)=>{
+      const key=`${ci}-${ri}-${ii}`;
+      const t=document.createElement('button');
+      t.className='tile'+(it.bonus?' bonus':'')+(results[key]==='correct'?' done-correct':results[key]==='missed'?' done-missed':'');
+      const typeLbl = it.t==='ou'?'Over / Under': it.t==='ch'?'Challenge': it.t==='list'?'List It': it.t==='chain'?'Chain': it.t==='link'?'Official Round': it.t==='qr'?'Final':'Question';
+      t.innerHTML=`<div class="tnum">${it.bonus?'★':ii+1}</div><div class="ttype">${typeLbl}</div><div class="tpts">${it.pts} pt${it.pts!==1?'s':''}</div>`;
+      t.onclick=()=>openItem(ci,ri,ii);
+      grid.appendChild(t);
+    });
+    R.appendChild(grid);
+  });
+  if(!cat.final) placeXiii('c'+ci);
+  window.scrollTo(0,0);
+}
+
+/* ============ HIDDEN XIII ============ */
+const XSPOTS=['top:70px;left:10px','bottom:24px;right:14px','top:45%;right:8px','bottom:70px;left:12px','top:120px;right:26px','bottom:30%;left:8px','top:80px;right:40%'];
+function placeXiii(id){
+  document.querySelectorAll('.xiii').forEach(e=>e.remove());
+  const idx = id==='home'?0:parseInt(id.slice(1),10)+1;
+  const sp=document.createElement('span');
+  sp.className='xiii'+(found[id]?' found':'');
+  sp.textContent='XIII';
+  sp.setAttribute('style', XSPOTS[idx%XSPOTS.length]);
+  sp.onclick=()=>{ if(found[id])return; found[id]=true; save(); sp.classList.add('found'); updateXiii();
+    if(Object.keys(found).length>=7) setTimeout(()=>$('bonuslay').classList.add('open'), 800); };
+  document.body.appendChild(sp);
+}
+function updateXiii(){ $('xiiibadge').textContent='XIII '+Object.keys(found).length+'/7'; }
+
+/* ============ MODAL ============ */
+function openItem(ci,ri,ii){
+  const cat=GAME[ci], it=cat.rounds[ri].items[ii], key=`${ci}-${ri}-${ii}`;
+  const m=$('modal');
+  m.parentElement.classList.add('open');
+  let html=`<button class="closex" onclick="closeModal()">×</button>
+    <span class="ptschip">${it.pts} pt${it.pts!==1?'s':''}</span>
+    <div class="mtag" style="color:${cat.accent}">${cat.name} · ${cat.rounds[ri].label}</div>
+    <div class="mq">${esc(it.q)}</div>`;
+
+  if(it.t==='ou'){
+    html+=`<div class="oubtns">
+      <button class="oubtn" id="ouOver" onclick="pickOU('OVER','${it.ans}','${it.price}')">OVER $13</button>
+      <button class="oubtn" id="ouUnder" onclick="pickOU('UNDER','${it.ans}','${it.price}')">UNDER $13</button></div>
+      <div class="answer" id="ans"><span class="albl">Actual Price</span><span id="ansbody"></span></div>`;
+  } else if(it.t==='tr'){
+    html+=`<div class="answer" id="ans"><span class="albl">Answer</span>${esc(it.a)}</div>`;
+  } else if(it.t==='list'){
+    html+=`<div class="listwrap" id="listwrap"></div>`;
+  } else if(it.t==='chain'){
+    html+=`<div class="chainwrap" id="chainwrap"></div>`;
+  } else if(it.t==='link'){
+    html+=`<div class="btnrow"><a class="btn goldb linka" href="${it.url}" target="_blank" rel="noopener">${it.label}</a></div>`;
+  } else if(it.t==='qr'){
+    html+=`<div class="qrwrap"><img src="${QR_SRC}" alt="Scan me"></div>`;
+  }
+
+  if(it.timer){
+    stopTimer(); tRemain=it.timer;
+    html+=`<div class="timerbox" id="timerbox">
+      <div class="tdisp ${it.hideTimer?'hidden-mode':''}" id="tdisp">${fmt(it.timer)}</div>
+      <div class="trow">
+        <button class="tbtn go" onclick="startTimer(${it.timer})">▶ Start</button>
+        <button class="tbtn stop" onclick="stopTimer()">■ Stop</button>
+        <button class="tbtn" onclick="resetTimer(${it.timer})">↺ Reset</button>
+        ${it.hideTimer?`<button class="tbtn" onclick="toggleBlur()">👁 Peek (host only)</button>`:''}
+      </div></div>`;
+  }
+  if(it.note) html+=`<div class="mnote"><b>HOST NOTE:</b> ${esc(it.note)}</div>`;
+
+  html+=`<div class="btnrow">`;
+  if(it.t==='tr'||it.t==='ou') html+=`<button class="btn reveal" onclick="revealAns()">Reveal Answer</button>`;
+  if(it.t==='list') html+=`<button class="btn reveal" onclick="revealListNext()">Reveal Next</button><button class="btn neutral" onclick="revealListAll()">Reveal All</button>`;
+  if(it.t==='chain') html+=`<button class="btn reveal" onclick="revealChainNext()">Reveal Next Link</button>`;
+  if(it.t!=='qr') html+=`<button class="btn good" onclick="settle('${key}','correct',${it.pts})">✓ He Got It (+${it.pts})</button>
+    <button class="btn bad" onclick="settle('${key}','missed',0)">✗ Not Today</button>`;
+  else html+=`<button class="btn good" onclick="settle('${key}','correct',0)">✓ Scanned. Gone. Trip revealed.</button>`;
+  html+=`</div>`;
+
+  m.innerHTML=html;
+  m.dataset.key=key;
+
+  if(it.t==='list'){
+    const w=$('listwrap');
+    it.list.forEach(li=>{ const d=document.createElement('div'); d.className='listitem hidden'; d.textContent=li; w.appendChild(d); });
+  }
+  if(it.t==='chain'){
+    const w=$('chainwrap');
+    it.chain.forEach((word,i)=>{
+      if(i>0){ const a=document.createElement('span'); a.className='chainarrow'; a.textContent='→'; w.appendChild(a); }
+      const d=document.createElement('span'); d.className='chainword'+(i===0?'':' hidden-w'); d.textContent=word; w.appendChild(d);
+    });
+  }
+}
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function pickOU(pick,ans,price){
+  const right = pick===ans;
+  const mark=(el,side)=>{ const cls=(side===ans)?'picked-right':(pick===side?'picked-wrong':null); if(cls) el.classList.add(cls); };
+  mark($('ouOver'),'OVER'); mark($('ouUnder'),'UNDER');
+  $('ansbody').textContent=`${price} — it's ${ans}! ${right?'Nailed it.':'Ouch. Groceries are humbling.'}`;
+  $('ans').classList.add('shown');
+}
+function revealAns(){ const a=$('ans'); if(a) a.classList.add('shown'); }
+function revealListNext(){ const h=document.querySelector('#listwrap .listitem.hidden'); if(h) h.classList.remove('hidden'); }
+function revealListAll(){ document.querySelectorAll('#listwrap .listitem.hidden').forEach(e=>e.classList.remove('hidden')); }
+function revealChainNext(){ const h=document.querySelector('#chainwrap .chainword.hidden-w'); if(h) h.classList.remove('hidden-w'); }
+
+function settle(key,res,pts){
+  if(!results[key]){ score+=pts; }
+  else if(results[key]==='correct' && res==='missed'){ score-=keyPts(key); }
+  else if(results[key]==='missed' && res==='correct'){ score+=pts; }
+  results[key]=res;
+  $('score').textContent=score;
+  save();
+  closeModal();
+  if(curCat!==null) openCat(curCat);
+}
+function keyPts(key){ const [c,r,i]=key.split('-').map(Number); return GAME[c].rounds[r].items[i].pts; }
+function adj(d){ score+=d; $('score').textContent=score; save(); }
+
+function closeModal(){ stopTimer(); $('overlay').classList.remove('open'); }
+$('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeModal(); });
+
+/* ============ TIMER ============ */
+let tRemain=0;
+function fmt(s){ const m=Math.floor(s/60), ss=s%60; return m>0?`${m}:${String(ss).padStart(2,'0')}`:`${ss}`; }
+function startTimer(init){
+  stopTimer();
+  if(tRemain<=0) tRemain=init;
+  timerInt=setInterval(()=>{
+    tRemain--;
+    const d=$('tdisp'); if(!d){ stopTimer(); return; }
+    d.textContent=fmt(Math.max(tRemain,0));
+    if(tRemain<=0){ stopTimer(); const tb=$('timerbox'); if(tb) tb.classList.add('flash'); }
+  },1000);
+}
+function stopTimer(){ if(timerInt){ clearInterval(timerInt); timerInt=null; } }
+function resetTimer(init){ stopTimer(); tRemain=init; const d=$('tdisp'); if(d) d.textContent=fmt(init); const tb=$('timerbox'); if(tb) tb.classList.remove('flash'); }
+function toggleBlur(){ const d=$('tdisp'); if(d) d.classList.toggle('hidden-mode'); }
+
+/* ============ HOST KEY ============ */
+function openHost(){ $('hostmodal').classList.add('open'); }
+function closeHost(){ $('hostmodal').classList.remove('open'); }
+function tryPin(){
+  if($('pin').value==='0711'){ $('hostlock').classList.add('hidden'); $('hostbody').classList.remove('hidden'); }
+}
+function unlockFinal(){ finalUnlocked=true; save(); closeHost(); goHome(); }
+
+/* ============ FINAL ============ */
+function showFinal(){
+  $('home').classList.add('hidden'); $('catview').classList.add('hidden');
+  $('finalview').classList.remove('hidden');
+  const max=maxScore();
+  $('finalscore').textContent=score;
+  $('finalmax').textContent=`out of a possible ${max} points`;
+  const pct=score/max;
+  let v;
+  if(pct>=.8) v="OFFICIALLY SMARTER THAN A 6/7 GRADER. Which is impressive, because he IS one. Thirteen looks good on you, Colson. 🎂";
+  else if(pct>=.6) v="Certified 6/7 Grader with Honors. The adults in the room should be nervous.";
+  else if(pct>=.4) v="Solidly mid — which, in 2026 slang, we're told is NOT a compliment. Still smarter than most adults at Mario Kart though.";
+  else v="The good news: you're 13 now, and there's a whole year to study before the next birthday exam. The cake doesn't care about your score.";
+  $('verdict').textContent=v;
+  confetti();
+  window.scrollTo(0,0);
+}
+function backFromFinal(){ goHome(); }
+function confetti(){
+  const em=['🎉','🎂','⭐','🥳','1️⃣3️⃣','🎈','🏈','🍬'];
+  for(let i=0;i<40;i++){
+    const s=document.createElement('span');
+    s.className='confetti'; s.textContent=em[Math.floor(Math.random()*em.length)];
+    s.style.left=Math.random()*100+'vw';
+    s.style.animationDuration=(2.5+Math.random()*2.5)+'s';
+    s.style.animationDelay=(Math.random()*1.2)+'s';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),6000);
+  }
+}
+
+$('score').textContent=score;
+renderHome();
+</script>
+</body>
+</html>
