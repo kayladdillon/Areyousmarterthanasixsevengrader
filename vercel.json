@@ -1,9 +1,10 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
       "has": [{ "type": "host", "value": "colson-big-13.vercel.app" }],
-      "destination": "/colson-big-13_index.html"
+      "destination": "/colson-big-13_index.html",
+      "permanent": false
     }
   ]
 }
